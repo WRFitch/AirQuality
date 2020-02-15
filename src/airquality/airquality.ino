@@ -22,13 +22,13 @@ void loop() {
     Serial.println("#Raw Measurement failed");
     return;
   }
-  Serial.print(sgp.TVOC); 
-  Serial.print(sgp.eCO2); 
-  Serial.print(sgp.rawH2); 
-  Serial.println(sgp.rawEthanol); 
+  Serial.print(String(sgp.TVOC) + " ");
+  Serial.print(String(sgp.eCO2) + " "); 
+  Serial.print(String(sgp.rawH2) + " "); 
+  Serial.println(String(sgp.rawEthanol)); 
 
-//take measurements every minute
-  delay(60000);
+//take measurements every 1 seconds
+  delay(1000);
 
   counter++;
   if (counter == 30) {
@@ -41,6 +41,3 @@ void loop() {
     }
   }
 }
-
-
-
