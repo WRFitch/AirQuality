@@ -11,5 +11,5 @@ fi
 
 PROJECT_ROOT=$1
 
-arduino --upload --verbose-upload ${PROJECT_ROOT}/src/airquality/airquality.ino
+arduino --upload ${PROJECT_ROOT}/src/airquality/airquality.ino
 cu -l /dev/ttyACM0 -s 9600 >> "${PROJECT_ROOT}/logs/$(date +%Y_%m_%d).log"

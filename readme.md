@@ -1,8 +1,3 @@
 # AirQuality
-A raspberry pi, arduino and Adafruit SGP30 application that measures and logs air quality. 
 
-### TODO 
-- write python script to run arduino script and log output to automatically generated daily log file 
-- write cron job on rpi to run python script
-- figure out how to extract data from log file into something usable 
-- write write-up 
+An arduino project to measure & log air quality. Runs on a cron job on a battery-powered Raspberry Pi. There's a number of factors not taken into account here, such as sensor calibration, temperature and humidity, but this project only exists to satisfy my curiosity. 
