@@ -2,6 +2,9 @@
 
 """
 python stats script to look through logs and graph results. 
+
+TODO put the metadata and matrix in an object, you clown. Also make the matrix
+an actual matrix.
 """
 
 from datetime import datetime, timedelta
@@ -10,6 +13,8 @@ import os
 import matplotlib
 from matplotlib import pyplot as pyplot
 import sys
+from watchdog.observers import Observer
+from watchdog.events import LoggingEventHandler
 
 def graph(measurements):
     #AAAAAAAAAA
@@ -34,7 +39,8 @@ def get_data_from_file(logfile):
     log = open(logfile, "r")
 
     #first row is metadata - [date, timestamp, step value]
-    data = [[logfile[-14:-4]]]
+    date = logfile[-14:-4]
+    data = [[date]]
 
     # TODO refactor, this is nasty
     while True:
@@ -45,8 +51,8 @@ def get_data_from_file(logfile):
             #get metadata 
             if line[1:11] == "TIMESTAMP=": 
                 #fuck timestamps. this is why we can't have nice things. 
-                timestamp = datetime(year = int(data[0][0][0:4]), month = \
-                        int(data[0][0][5:7]), day = int(data[0][0][8:10]), \
+                timestamp = datetime(year = int(date[0:4]), month = \
+                        int(date[5:7]), day = int(date[8:10]), \
                         hour = int(line[12:14]), minute = int(line[15:17]), \
                         second = int(line[18:20]))
                 data[0].append(timestamp)
@@ -55,7 +61,7 @@ def get_data_from_file(logfile):
                 data[0].append(repeat_interval)
             continue
 
-        #calculate timestamp 
+        #calculate timestamp - this doesn't work if there's any number of broken steps. 
         timestamp += timedelta(seconds = repeat_interval)
         line += " " + str(timestamp)
         data.append(line.split(" "))
@@ -72,10 +78,16 @@ def get_avg_measurements(logfile):
         val = val / len(logfile)-1
     return avgs
 
+#monitor logfile for changes
+def tail(logfile):
+    os.system("tail -n +0 -f " + logfile)
+
 def main(args):
     if 'today' in args:
         graph(get_data_from_file(logfile_today))
-    if 'day' in args:
+    elif 'tail' in args:
+        tail(logfile_today)
+    elif 'day' in args:
         day = args[2]
         graph(get_data_from_file(format_date(day)))
     elif 'all' in args:
@@ -88,10 +100,11 @@ def main(args):
 
 #still using separate print methods for lines? come on
 def print_help():
-    print("args:")
-    print("today - graph today's results")
-    print("day - graph a given date's results (given in the format YYYY_MM_DD)")
-    print("all - graph average daily results")
+    print("args:\n")
+    print("tail - tail today's results\n")
+    print("today - graph today's results\n")
+    print("day - graph a given date's results (given in the format YYYY_MM_DD)\n")
+    print("all - graph average daily results\n")
 
 def format_date(date):
     return logdir + date + ".log"
