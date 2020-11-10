@@ -36,35 +36,34 @@ def graph(measurements):
 #gets this rough logfile and presents it in a nice clean 2d list
 def get_data_from_file(logfile):
     print("getting data from " + logfile)
-    log = open(logfile, "r")
+    #first row is metadata - [timestamp, step value]. This should be extracted into a separate list in a class. 
+    datestamp = logfile[-14:-4]
+    data = [[]]
 
-    #first row is metadata - [date, timestamp, step value]
-    date = logfile[-14:-4]
-    data = [[date]]
+    with open(logfile, "r") as log:
+        for logline in log:
+            line = logline.rstrip()
+            #check line matches standard numeric format 
+            if line.replace(" ", "").replace(".", "").isnumeric():
+                #calculate timestamp - this doesn't work if there's any number of broken steps. 
+                timestamp += timedelta(seconds = repeat_interval)
+                line += " " + str(timestamp)
+                data.append(line.split(" "))
+                continue
 
-    # TODO refactor, this is nasty
-    while True:
-        line = log.readline().replace("\n", "")
-        if not line: break
-        #ignore useless lines. onnected matches Disconnected and Connected. 
-        if line.find("#") != -1 or line.find("onnected") != -1:
-            #get metadata 
+            #get metadata where available
             if line[1:11] == "TIMESTAMP=": 
-                #fuck timestamps. this is why we can't have nice things. 
-                timestamp = datetime(year = int(date[0:4]), month = \
-                        int(date[5:7]), day = int(date[8:10]), \
-                        hour = int(line[12:14]), minute = int(line[15:17]), \
-                        second = int(line[18:20]))
+                timestamp = datetime(year = int(datestamp[0:4]), \
+                    month = int(datestamp[5:7]), day = int(datestamp[8:10]), \
+                    hour = int(line[12:14]), minute = int(line[15:17]), \
+                    second = int(line[18:20]))
                 data[0].append(timestamp)
-            if line[1:6] == "STEP=": 
+            elif line[1:6] == "STEP=": 
                 repeat_interval = int(line[6:])
                 data[0].append(repeat_interval)
-            continue
-
-        #calculate timestamp - this doesn't work if there's any number of broken steps. 
-        timestamp += timedelta(seconds = repeat_interval)
-        line += " " + str(timestamp)
-        data.append(line.split(" "))
+            elif "Measurement failed" in line:
+                # error messages are posted once a second - update timestamp to be sure. 
+                timestamp += timedelta(seconds = 1)
     return data
 
 #get average greenhouse gas data for that logfile, preserving metadata header
@@ -100,11 +99,11 @@ def main(args):
 
 #still using separate print methods for lines? come on
 def print_help():
-    print("args:\n")
-    print("tail - tail today's results\n")
-    print("today - graph today's results\n")
-    print("day - graph a given date's results (given in the format YYYY_MM_DD)\n")
-    print("all - graph average daily results\n")
+    print("""args:
+tail - tail today's results
+today - graph today's results
+day - graph a given date's results (given in the format YYYY_MM_DD)
+all - graph average daily results""")
 
 def format_date(date):
     return logdir + date + ".log"
