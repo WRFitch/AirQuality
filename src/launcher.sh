@@ -1,6 +1,6 @@
 #!/bin/sh
-# launcher.sh 
-# 
+# arduino logger script. 
+
 # first arg is project root 
 
 if [ -z "$1" ]
@@ -10,8 +10,13 @@ then
 fi
 
 PROJECT_ROOT=$1
+LOGFILE="${PROJECT_ROOT}/logs/$(date +%Y_%m_%d).log"
 
-# uncomment if airquality.ino is not already loaded onto the arduino
-# rPi uses an old compiler that can't handle my sweet scripts bro 
+# uncomment if airquality.ino is not already loaded onto the arduino - rPi uses
+# an old compiler that doesn't work with this sketch, because reasons
 # arduino --upload ${PROJECT_ROOT}/src/airquality/airquality.ino
-cu -l /dev/ttyACM0 -s 9600 >> "${PROJECT_ROOT}/logs/$(date +%Y_%m_%d).log"
+
+# Calculating the recorded time from here does rely on the arduino being on 
+# time and in sync - we'll see if this is a bad idea.
+echo "#TIMESTAMP=$(date +_%H_%M_%S)" >> $LOGFILE
+cu -l /dev/ttyACM0 -s 9600 >> $LOGFILE
