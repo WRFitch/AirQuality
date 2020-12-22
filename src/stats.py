@@ -5,6 +5,7 @@ python stats script to look through logs and graph results.
 
 TODO put the metadata and matrix in an object, you clown. Also make the matrix
 an actual matrix.
+TODO fix whatever is making matlab take so long. Maybe it's the thousands and thousands of timestamps it has to manage? 
 """
 
 from datetime import datetime, timedelta
