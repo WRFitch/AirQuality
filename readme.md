@@ -9,3 +9,5 @@ An arduino project to measure & log air quality. Runs on a cron job on a battery
 1. Notice that there's an uncomfortably high volume of CO2 everywhere, because we live in a cyberpunk hellscape these days.
 
 [there's a marginally more detailed writeup here](https://willfitch.com/projects/arduino_air_sensor.html) 
+
+[There's instructions for a better version of this here](https://www.airgradient.com/diy/)
