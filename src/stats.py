@@ -5,7 +5,7 @@ python stats script to look through logs and graph results.
 
 TODO put the metadata and matrix in an object, you clown. Also make the matrix
 an actual matrix.
-TODO fix whatever is making matlab take so long. Maybe it's the thousands and thousands of timestamps it has to manage? 
+TODO fix whatever is making matplotlib take so long. Maybe it's the thousands and thousands of timestamps it has to manage? 
 """
 
 from datetime import datetime, timedelta
@@ -18,14 +18,20 @@ from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 
 def graph(measurements):
-    #AAAAAAAAAA
-    # TODO this is garbage - put it in a numpy matrix or something. I miss real arrays. 
-    VOC = [float(item[0]) for item in measurements[1:]]
-    CO2 = [float(item[1]) for item in measurements[1:]]
-    H2 = [float(item[2]) for item in measurements[1:]]
-    ethanol = [float(item[3]) for item in measurements[1:]]
-    date = [item[4] for item in measurements[1:]]
-    time = [item[5] for item in measurements[1:]]
+    VOC = []
+    CO2 = [] 
+    H2 = []
+    ethanol = [] 
+    time = []  
+    date = []
+    # TODO simplify 
+    for line in measurements[1:]:
+        VOC.append(float(line[0]))
+        CO2.append(float(line[1]))
+        H2.append(float(line[2]))
+        ethanol.append(float(line[3]))
+        date.append(line[4])
+        time.append(line[5])
 
     _, axs = pyplot.subplots(4)
     axs[0].plot(time, VOC)
@@ -34,10 +40,10 @@ def graph(measurements):
     axs[3].plot(time, ethanol)
     pyplot.show()
 
-#gets this rough logfile and presents it in a nice clean 2d list
+# gets this rough logfile and presents it in a clean 2d list
 def get_data_from_file(logfile):
     print("getting data from " + logfile)
-    #first row is metadata - [timestamp, step value]. This should be extracted into a separate list in a class. 
+    # first row is metadata - [timestamp, step value]. This should be extracted into a separate list in a class. 
     datestamp = logfile[-14:-4]
     data = [[]]
 
@@ -67,8 +73,8 @@ def get_data_from_file(logfile):
                 timestamp += timedelta(seconds = 1)
     return data
 
-#get average greenhouse gas data for that logfile, preserving metadata header
-#there has to be a better way of doing this. 
+# get average greenhouse gas data for that logfile, preserving metadata header
+# there has to be a better way of doing this. 
 def get_avg_measurements(logfile):
     avgs = [logfile[0]]
     for line in logfile[1:]:
@@ -98,7 +104,6 @@ def main(args):
     else:
         print_help()
 
-#still using separate print methods for lines? come on
 def print_help():
     print("""args:
 tail - tail today's results
